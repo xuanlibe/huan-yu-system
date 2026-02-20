@@ -2297,7 +2297,8 @@ page_map = {
     'forge': show_forge_page,
     'array': show_array_page,
     'dungeon': show_dungeon_page,
-    'xuanli_admin': show_xuanli_admin_page,  # 👈 新增这一行
+    'xuanli_admin': show_xuanli_admin_page,
+}
 
 
 # 主程序执行逻辑
