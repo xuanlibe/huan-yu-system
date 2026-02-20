@@ -2295,6 +2295,25 @@ def show_xuanli_admin_page():
 # 🚀 主程序
 # ==============================
 
+import streamlit as st
+
+CURRENT_VERSION = "1.0.0"  # 设置你的当前版本号
+
+def show_login_page():
+    st.title("登录页面")
+    st.write("请登录...")
+
+def main_page():
+    st.title("主页面")
+    st.write("主页面内容")
+
+# 定义页面映射
+page_map = {
+    'login': show_login_page,
+    'main': main_page,
+    # 添加其他页面...
+}
+
 def main():
     # 必须首先初始化 page 属性！
     if 'page' not in st.session_state:
@@ -2303,24 +2322,6 @@ def main():
     if 'user' not in st.session_state:
         st.session_state.user = None
     
-import streamlit as st
-
-# 修复：在访问 st.session_state.page 之前确保它已初始化
-# 将这行代码添加到你现有代码的最前面
-if 'page' not in st.session_state:
-    st.session_state.page = 'main'  # 或者设置为你的默认页面
-
-# 如果你的 page_map 已经定义了，确保它也在这个检查之后
-# 假设你的 page_map 如下定义：
-page_map = {
-    'main': lambda: print("Main page"),  # 替换为你的实际页面函数
-    'other_page': lambda: print("Other page")  # 替换为你的实际页面函数
-}
-
-# 现在可以安全地执行这一行（原第2306行）
-if st.session_state.page in page_map:
-    page_map[st.session_state.page]()
-
     # 其他初始化...
     if 'system_version' not in st.session_state:
         st.session_state.system_version = CURRENT_VERSION
@@ -2336,6 +2337,8 @@ if st.session_state.page in page_map:
         st.session_state.page = 'login'
         show_login_page()
 
+# 调用 main 函数启动应用
+main()
 # 页面映射表
 page_map = {
     'login': show_login_page,
