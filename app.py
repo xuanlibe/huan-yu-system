@@ -982,6 +982,30 @@ class DungeonSystem:
 # 🖥️ 页面路由与UI
 # ==============================
 
+import streamlit as st
+
+# 初始化 session state 中的 page 属性
+if 'page' not in st.session_state:
+    st.session_state.page = 'main'  # 设置默认页面
+
+# 定义页面映射
+page_map = {
+    'main': lambda: st.write("这是主页面"),
+    'settings': lambda: st.write("这是设置页面"),
+    'about': lambda: st.write("这是关于页面")
+}
+
+# 现在可以安全地访问 st.session_state.page
+if st.session_state.page in page_map:
+    page_map[st.session_state.page]()
+else:
+    st.write("页面未找到")
+
+# 页面导航按钮
+st.sidebar.button('主页面', on_click=lambda: setattr(st.session_state, 'page', 'main'))
+st.sidebar.button('设置', on_click=lambda: setattr(st.session_state, 'page', 'settings'))
+st.sidebar.button('关于', on_click=lambda: setattr(st.session_state, 'page', 'about'))
+
 def show_login_page():
     st.set_page_config(page_title="寰宇系统 - 登录", layout="centered")
     st.title("🌌 寰宇系统")
