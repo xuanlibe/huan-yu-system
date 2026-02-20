@@ -237,6 +237,33 @@ def safe_db_operation(func, *args, **kwargs):
             st.toast(f"❌ 系统错误: {error_msg[:100]}", icon="💥")
             return None
 
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return hash_password(plain_password) == hashed_password
+
+def get_current_time_str() -> str:
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+def ensure_user_cultivation_record(user_id: str):
+    try:
+        data = supabase.table("user_cultivation").select("*").eq("user_id", user_id).execute().data
+        if not data:
+            supabase.table("user_cultivation").insert({
+                "user_id": user_id,
+                "realm": "练气",
+                "stage": 1,
+                "exp": 0,
+                "hp": 100,
+                "mp": 50,
+                "attack": 10,
+                "defense": 5,
+                "lifespan": 80
+            }).execute()
+    except Exception as e:
+        st.toast(f"⚠️ 初始化修炼数据失败: {str(e)[:50]}", icon="⚠️")
+
 # ==============================
 # 👤 用户类
 # ==============================
@@ -256,48 +283,48 @@ class User:
         self.defense = user_data.get("defense", 5)
         self.lifespan = user_data.get("lifespan", 80)
 
-@classmethod
-def login(cls, username: str, password: str) -> Optional["User"]:
-    if not username or not password:
-        return None
-    # 🔒 强化：轩璃必须使用硬编码密码，无视数据库
-    if username == MAIN_ADMIN_USERNAME:
-        if password == MAIN_ADMIN_PASSWORD:
-            # 模拟一个超级用户对象（不依赖数据库）
-            user_data = {
-                "id": "xuanli_main_admin",
-                "username": "轩璃",
-                "spirit_stones": 999999999,
-                "is_admin": True,
-                "is_super_admin": True,
-                "cultivation_level": 999,
-                "realm": "鸿蒙",
-                "stage": 9,
-                "hp": 110000000000,
-                "mp": 10000000000,
-                "attack": 500000000,
-                "defense": 500000000,
-                "lifespan": 100000000000,
-                "last_login": get_current_time_str()
-            }
-            return cls(user_data)
-        else:
-            st.toast("❌ 主管理员密码错误", icon="🔒")
+    @classmethod
+    def login(cls, username: str, password: str) -> Optional["User"]:
+        if not username or not password:
             return None
-    # 其他用户的正常流程
-    response = supabase.table("users").select("*").eq("username", username).execute()
-    users = response.data if response and hasattr(response, 'data') else []
-    
-    if not users:
-        return None
-    user_data = users[0]
-    if not verify_password(password, user_data.get("password_hash", "")):
-        return None
-    if user_data.get("is_banned", False):
-        st.toast("❌ 账号已被封禁", icon="🚫")
-        return None
-    supabase.table("users").update({"last_login": get_current_time_str()}).eq("id", user_data["id"]).execute()
-    return cls(user_data)
+        # 🔒 强化：轩璃必须使用硬编码密码，无视数据库
+        if username == MAIN_ADMIN_USERNAME:
+            if password == MAIN_ADMIN_PASSWORD:
+                # 模拟一个超级用户对象（不依赖数据库）
+                user_data = {
+                    "id": "xuanli_main_admin",
+                    "username": "轩璃",
+                    "spirit_stones": 999999999,
+                    "is_admin": True,
+                    "is_super_admin": True,
+                    "cultivation_level": 999,
+                    "realm": "鸿蒙",
+                    "stage": 9,
+                    "hp": 110000000000,
+                    "mp": 10000000000,
+                    "attack": 500000000,
+                    "defense": 500000000,
+                    "lifespan": 100000000000,
+                    "last_login": get_current_time_str()
+                }
+                return cls(user_data)
+            else:
+                st.toast("❌ 主管理员密码错误", icon="🔒")
+                return None
+        # 其他用户的正常流程
+        response = supabase.table("users").select("*").eq("username", username).execute()
+        users = response.data if response and hasattr(response, 'data') else []
+        
+        if not users:
+            return None
+        user_data = users[0]
+        if not verify_password(password, user_data.get("password_hash", "")):
+            return None
+        if user_data.get("is_banned", False):
+            st.toast("❌ 账号已被封禁", icon="🚫")
+            return None
+        supabase.table("users").update({"last_login": get_current_time_str()}).eq("id", user_data["id"]).execute()
+        return cls(user_data)
 
     @staticmethod
     def update_spirit_stones(user_id: str, amount: int):
@@ -2278,6 +2305,11 @@ def main():
         st.session_state.user = None
     
     # 其他初始化...
+    if 'system_version' not in st.session_state:
+        st.session_state.system_version = CURRENT_VERSION
+    if st.session_state.system_version != CURRENT_VERSION:
+        st.session_state.clear()
+        st.rerun()
     
     # 页面路由逻辑
     if st.session_state.page in page_map:
@@ -2301,13 +2333,9 @@ page_map = {
     'xuanli_admin': show_xuanli_admin_page,
 }
 
-
-# 主程序执行逻辑
-if st.session_state.page in page_map:
-    page_map[st.session_state.page]()
-else:
-    st.session_state.page = 'login'
-    st.rerun()
+# ==============================
+# ▶️ 应用入口
+# ==============================
 
 if __name__ == "__main__":
     main()
