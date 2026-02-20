@@ -2297,24 +2297,28 @@ def show_xuanli_admin_page():
 
 import streamlit as st
 
-CURRENT_VERSION = "1.0.0"  # 设置你的当前版本号
+CURRENT_VERSION = "1.0.0"
 
 def show_login_page():
     st.title("登录页面")
     st.write("请登录...")
-    # 添加实际的登录表单
-    username = st.text_input("用户名")
-    password = st.text_input("密码", type="password")
-    if st.button("登录"):
-        # 登录逻辑
-        st.session_state.user = username
-        st.session_state.page = 'main'
-        st.rerun()
+    
+    # 使用唯一的key来避免重复ID问题
+    username = st.text_input("用户名", key="login_username")
+    password = st.text_input("密码", type="password", key="login_password")
+    login_button = st.button("登录", key="login_submit")
+    
+    if login_button:
+        if username and password:  # 简单验证
+            st.session_state.user = username
+            st.session_state.page = 'main'
+            st.rerun()
 
 def main_page():
     st.title("主页面")
-    st.write("主页面内容")
-    if st.button("登出"):
+    st.write(f"欢迎, {st.session_state.user}!")
+    
+    if st.button("登出", key="logout_btn"):
         st.session_state.user = None
         st.session_state.page = 'login'
         st.rerun()
@@ -2331,25 +2335,35 @@ def initialize_session_state():
     if 'system_version' not in st.session_state:
         st.session_state.system_version = CURRENT_VERSION
     if st.session_state.system_version != CURRENT_VERSION:
+        # 保留必要的状态，清除其他状态
+        current_user = st.session_state.get('user')
+        current_page = st.session_state.get('page', 'login')
+        
         st.session_state.clear()
-        st.rerun()
+        
+        # 恢复必要的状态
+        st.session_state.user = current_user
+        st.session_state.page = current_page
+        st.session_state.system_version = CURRENT_VERSION
 
 def main():
     # 初始化 session state
     initialize_session_state()
     
-    # 页面路由逻辑 - 只调用一次
-    if st.session_state.page in ['login', 'main']:
-        if st.session_state.page == 'login':
-            show_login_page()
-        elif st.session_state.page == 'main':
-            main_page()
+    # 根据当前页面显示内容
+    if st.session_state.page == 'login':
+        show_login_page()
+    elif st.session_state.page == 'main':
+        main_page()
     else:
+        # 默认回到登录页
         st.session_state.page = 'login'
         show_login_page()
 
 # 启动应用
-main()
+if __name__ == "__main__":
+    main()
+
 # 页面映射表
 page_map = {
     'login': show_login_page,
