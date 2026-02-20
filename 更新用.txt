@@ -1,0 +1,4 @@
+cd C:\Users\T\Desktop\cangbaoge
+git add .
+git commit -m "fix: 完全移除 demo_test 测试代码，修复页面路由和 NameError 错误"
+git push origin main
