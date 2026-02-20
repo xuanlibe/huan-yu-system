@@ -2302,42 +2302,53 @@ CURRENT_VERSION = "1.0.0"  # 设置你的当前版本号
 def show_login_page():
     st.title("登录页面")
     st.write("请登录...")
+    # 添加实际的登录表单
+    username = st.text_input("用户名")
+    password = st.text_input("密码", type="password")
+    if st.button("登录"):
+        # 登录逻辑
+        st.session_state.user = username
+        st.session_state.page = 'main'
+        st.rerun()
 
 def main_page():
     st.title("主页面")
     st.write("主页面内容")
+    if st.button("登出"):
+        st.session_state.user = None
+        st.session_state.page = 'login'
+        st.rerun()
 
-# 定义页面映射
-page_map = {
-    'login': show_login_page,
-    'main': main_page,
-    # 添加其他页面...
-}
-
-def main():
-    # 必须首先初始化 page 属性！
+def initialize_session_state():
+    """初始化session state"""
     if 'page' not in st.session_state:
         st.session_state.page = 'login'
     
     if 'user' not in st.session_state:
         st.session_state.user = None
     
-    # 其他初始化...
+    # 版本控制
     if 'system_version' not in st.session_state:
         st.session_state.system_version = CURRENT_VERSION
     if st.session_state.system_version != CURRENT_VERSION:
         st.session_state.clear()
         st.rerun()
+
+def main():
+    # 初始化 session state
+    initialize_session_state()
     
-    # 页面路由逻辑
-    if st.session_state.page in page_map:
-        page_func = page_map[st.session_state.page]
-        page_func()
+    # 页面路由逻辑 - 只调用一次
+    if st.session_state.page in ['login', 'main']:
+        if st.session_state.page == 'login':
+            show_login_page()
+        elif st.session_state.page == 'main':
+            main_page()
     else:
         st.session_state.page = 'login'
         show_login_page()
 
-# 调用 main 函数启动应用
+# 启动应用
 main()
 # 页面映射表
 page_map = {
