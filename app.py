@@ -2372,9 +2372,8 @@ page_map = {
     'forge': show_forge_page,
     'array': show_array_page,
     'dungeon': show_dungeon_page,
-    'admin': show_admin_page,
     'xuanli_admin': show_xuanli_admin_page,  # 👈 新增这一行
-}
+
 
 # 主程序执行逻辑
 if st.session_state.page in page_map:
