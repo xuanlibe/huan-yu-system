@@ -2291,10 +2291,6 @@ def show_xuanli_admin_page():
         st.info("日志功能待开发，当前仅显示时间")
         st.write(f"当前时间: {get_current_time_str()}")
 
-# ==============================
-# 🚀 主程序
-# ==============================
-
 import streamlit as st
 
 CURRENT_VERSION = "1.0.0"
@@ -2323,6 +2319,42 @@ def main_page():
         st.session_state.page = 'login'
         st.rerun()
 
+# 添加缺失的页面函数
+def show_main_page():
+    main_page()
+
+def show_shop_page():
+    st.title("商店页面")
+    st.write("商店功能待实现")
+
+def show_backpack_page():
+    st.title("背包页面")
+    st.write("背包功能待实现")
+
+def show_sect_page():
+    st.title("门派页面")
+    st.write("门派功能待实现")
+
+def show_alchemy_page():
+    st.title("炼丹页面")
+    st.write("炼丹功能待实现")
+
+def show_forge_page():
+    st.title("锻造页面")
+    st.write("锻造功能待实现")
+
+def show_array_page():
+    st.title("阵法页面")
+    st.write("阵法功能待实现")
+
+def show_dungeon_page():
+    st.title("副本页面")
+    st.write("副本功能待实现")
+
+def show_xuanli_admin_page():
+    st.title("管理页面")
+    st.write("管理功能待实现")
+
 def initialize_session_state():
     """初始化session state"""
     if 'page' not in st.session_state:
@@ -2350,37 +2382,28 @@ def main():
     # 初始化 session state
     initialize_session_state()
     
+    # 页面映射表 - 移到这里，确保所有函数都已定义
+    page_map = {
+        'login': show_login_page,
+        'main': show_main_page,
+        'shop': show_shop_page,
+        'backpack': show_backpack_page,
+        'sect': show_sect_page,
+        'alchemy': show_alchemy_page,
+        'forge': show_forge_page,
+        'array': show_array_page,
+        'dungeon': show_dungeon_page,
+        'xuanli_admin': show_xuanli_admin_page,
+    }
+    
     # 根据当前页面显示内容
-    if st.session_state.page == 'login':
-        show_login_page()
-    elif st.session_state.page == 'main':
-        main_page()
+    if st.session_state.page in page_map:
+        page_map[st.session_state.page]()
     else:
         # 默认回到登录页
         st.session_state.page = 'login'
         show_login_page()
 
-# 启动应用
-if __name__ == "__main__":
-    main()
-
-# 页面映射表
-page_map = {
-    'login': show_login_page,
-    'main': show_main_page,
-    'shop': show_shop_page,
-    'backpack': show_backpack_page,
-    'sect': show_sect_page,
-    'alchemy': show_alchemy_page,
-    'forge': show_forge_page,
-    'array': show_array_page,
-    'dungeon': show_dungeon_page,
-    'xuanli_admin': show_xuanli_admin_page,
-}
-
-# ==============================
-# ▶️ 应用入口
-# ==============================
-
+# 启动应用 - 只有一个入口点
 if __name__ == "__main__":
     main()
