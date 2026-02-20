@@ -24,9 +24,8 @@ if "SUPABASE_URL" in st.secrets:
     SUPABASE_URL = st.secrets["SUPABASE_URL"]
     SUPABASE_ANON_KEY = st.secrets["SUPABASE_ANON_KEY"]
 else:
-    # ⚠️ 请在此处替换为你的 Supabase 信息
-SUPABASE_URL = "https://rwfveqinwgwwdfkfsrna.supabase.co"  # ←←← 替换这里
-    SUPABASE_ANON_KEY = "sb_publishable_A0FQbhUOT2HqR6Li1MNtSA_nf5jpfHD"  # ←←← 替换这里
+    SUPABASE_URL = "https://rwfveqinwgwwdfkfsrna.supabase.co"  # ← 缩进 4 空格
+    SUPABASE_ANON_KEY = "sb_publishable_A0FQbhUOT2HqR6Li1MNtSA_nf5jpfHD"
 
 try:
     supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
