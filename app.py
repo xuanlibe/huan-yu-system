@@ -1487,11 +1487,6 @@ def test_backpack_system():
         if st.button("查看背包数据"):
             st.json(st.session_state.backpack_data)
 
-if __name__ == "__main__":
-    # 仅在直接运行此文件时执行测试
-    st.set_page_config(page_title="背包系统测试", layout="wide")
-    test_backpack_system()
-
 def show_sect_page():
     if not FEATURES["sect"]:
         st.warning("宗门系统暂未开放")
