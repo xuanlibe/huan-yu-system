@@ -2203,10 +2203,6 @@ def demo_test():
             
             st.write(f"- {item_name}: {inv_item['quantity']} 个")
 
-if __name__ == "__main__":
-    # 仅在直接运行此文件时执行演示
-    st.set_page_config(page_title="炼丹炼器系统演示", layout="wide")
-    demo_test()
 
 def show_array_page():
     if not FEATURES["array"]:
