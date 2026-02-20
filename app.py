@@ -2270,16 +2270,22 @@ def show_xuanli_admin_page():
 # ==============================
 
 def main():
+    # 必须首先初始化 page 属性！
     if 'page' not in st.session_state:
         st.session_state.page = 'login'
+    
     if 'user' not in st.session_state:
         st.session_state.user = None
-    if 'system_version' not in st.session_state:
-        st.session_state.system_version = CURRENT_VERSION
     
-    if st.session_state.system_version != CURRENT_VERSION:
-        st.session_state.clear()
-        st.rerun()
+    # 其他初始化...
+    
+    # 页面路由逻辑
+    if st.session_state.page in page_map:
+        page_func = page_map[st.session_state.page]
+        page_func()
+    else:
+        st.session_state.page = 'login'
+        show_login_page()
 
 # 页面映射表
 page_map = {
