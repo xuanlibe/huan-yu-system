@@ -981,31 +981,6 @@ class DungeonSystem:
 # ==============================
 # 🖥️ 页面路由与UI
 # ==============================
-
-import streamlit as st
-
-# 初始化 session state 中的 page 属性
-if 'page' not in st.session_state:
-    st.session_state.page = 'main'  # 设置默认页面
-
-# 定义页面映射
-page_map = {
-    'main': lambda: st.write("这是主页面"),
-    'settings': lambda: st.write("这是设置页面"),
-    'about': lambda: st.write("这是关于页面")
-}
-
-# 现在可以安全地访问 st.session_state.page
-if st.session_state.page in page_map:
-    page_map[st.session_state.page]()
-else:
-    st.write("页面未找到")
-
-# 页面导航按钮
-st.sidebar.button('主页面', on_click=lambda: setattr(st.session_state, 'page', 'main'))
-st.sidebar.button('设置', on_click=lambda: setattr(st.session_state, 'page', 'settings'))
-st.sidebar.button('关于', on_click=lambda: setattr(st.session_state, 'page', 'about'))
-
 def show_login_page():
     st.set_page_config(page_title="寰宇系统 - 登录", layout="centered")
     st.title("🌌 寰宇系统")
@@ -2328,6 +2303,24 @@ def main():
     if 'user' not in st.session_state:
         st.session_state.user = None
     
+import streamlit as st
+
+# 修复：在访问 st.session_state.page 之前确保它已初始化
+# 将这行代码添加到你现有代码的最前面
+if 'page' not in st.session_state:
+    st.session_state.page = 'main'  # 或者设置为你的默认页面
+
+# 如果你的 page_map 已经定义了，确保它也在这个检查之后
+# 假设你的 page_map 如下定义：
+page_map = {
+    'main': lambda: print("Main page"),  # 替换为你的实际页面函数
+    'other_page': lambda: print("Other page")  # 替换为你的实际页面函数
+}
+
+# 现在可以安全地执行这一行（原第2306行）
+if st.session_state.page in page_map:
+    page_map[st.session_state.page]()
+
     # 其他初始化...
     if 'system_version' not in st.session_state:
         st.session_state.system_version = CURRENT_VERSION
