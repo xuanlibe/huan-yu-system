@@ -256,7 +256,7 @@ class User:
         self.defense = user_data.get("defense", 5)
         self.lifespan = user_data.get("lifespan", 80)
 
-    @classmethod
+@classmethod
 def login(cls, username: str, password: str) -> Optional["User"]:
     if not username or not password:
         return None
