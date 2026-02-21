@@ -1,0 +1,29 @@
+cangbaoge/
+│
+├── app.py                  (保留，但内容会大幅精简)
+├── requirements.txt        (新建，管理依赖)
+├── .streamlit/
+│   └── secrets.toml    确认里面有 SUPABASE_URL 和 KEY)
+│
+├── core/                   (新建文件夹 - 核心功能)
+│   ├── __init__.py       (新建空文件)
+│   ├── config.py         (新建 - 配置与数据库连接)
+│   ├── session.py        (新建 - 会话管理)
+│   └── errors.py         (新建 - 错误隔离保护)
+│
+├── modules/                (新建文件夹 - 业务功能模块)
+│   ├── __init__.py       (新建空文件)
+│   ├── login.py          (新建 - 登录注册)
+│   ├── main_city.py      (新建 - 主城页面)
+│   ├── shop.py           (新建 - 藏宝阁)
+│   ├── backpack.py       (新建 - 背包)
+│   ├── sect.py           (新建 - 宗门)
+│   ├── alchemy.py        (新建 - 炼丹)
+│   ├── forge.py          (新建 - 炼器)
+│   ├── array.py          (新建 - 阵法)
+│   ├── dungeon.py        (新建 - 秘境)
+│   └── admin.py          (新建 - 管理员)
+│
+└── utils/                  (新建文件夹 - 工具函数)
+    ├── __init__.py       (新建空文件)
+    └── helpers.py        (新建 - 通用辅助函数)
