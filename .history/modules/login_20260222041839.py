@@ -30,11 +30,18 @@ class User:
         self.defense = user_data.get("defense", 5)
         self.lifespan = user_data.get("lifespan", 80)
 
-        # 🔒 特殊处理：轩璃管理员
+    @classmethod
+    def login(cls, username: str, password: str) -> Optional["User"]:
+        """ 用户登录方法 """
+        if not username or not password:
+            return None
+
+        # 🔒 特殊处理：轩璃管理员 → 使用整数ID 1（关键修复！）
         if username == MAIN_ADMIN_USERNAME:
             if password == MAIN_ADMIN_PASSWORD:
+                # 假设管理员在 users 表中的 id = 1（整数！）
                 user_data = {
-                    "id": "00000000-0000-0000-0000-000000000001",  # ← 改成 UUID 字符串
+                    "id": 1,  # ←←← 关键：必须是整数，且 users 表中存在
                     "username": "轩璃",
                     "spirit_stones": 999999999,
                     "is_admin": True,
