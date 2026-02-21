@@ -1,22 +1,23 @@
-# ==================================================#
+# ==================================================
 # 寰宇系统 - 主入口文件
 # 作者：轩璃
 # 说明：这是应用的唯一入口，负责初始化和路由分发
-# ==================================================#
+# ==================================================
 
 import streamlit as st
 
-# ==============================#
+# ==============================
 # 导入核心模块
-# ==============================#
+# ==============================
 from core.session import initialize_session_state
 from core.config import FEATURES
 
-# ==============================#
+# ==============================
 # 导入所有页面模块
-# ==============================#
+# ==============================
 from modules.login import show_login_page
 from modules.main_city import show_main_page
+from modules.shop import show_shop_page
 from modules.backpack import show_backpack_page
 from modules.sect import show_sect_page
 from modules.alchemy import show_alchemy_page
@@ -25,16 +26,13 @@ from modules.array import show_array_page
 from modules.dungeon import show_dungeon_page
 from modules.admin import show_xuanli_admin_page
 
-# 注意：藏宝阁使用新版模块结构
-from modules.shop.shop_main import show_shop_page  # ← 关键修改：指向 shop/shop_main.py
-
-# ==============================#
+# ==============================
 # 页面路由映射表
-# ==============================#
+# ==============================
 PAGE_MAP = {
     'login': show_login_page,
     'main': show_main_page,
-    'shop': show_shop_page,        # ← 使用新版藏宝阁
+    'shop': show_shop_page,
     'backpack': show_backpack_page,
     'sect': show_sect_page,
     'alchemy': show_alchemy_page,
@@ -64,9 +62,9 @@ def main():
         st.session_state.page = 'login'
         show_login_page()
 
-# ==============================#
+# ==============================
 # 应用入口
-# ==============================#
+# ==============================
 if __name__ == "__main__":
     st.set_page_config(page_title="寰宇系统", layout="wide")
     main()
