@@ -1,7 +1,6 @@
 # ==================================================#
 # 物品定义管理器（编辑 effect 字段）
 # 所有管理员可修改物品描述（effect）
-# 新增：区分系统商品与玩家商品，强化权限提示
 # ==================================================#
 
 import streamlit as st
@@ -18,49 +17,28 @@ def show_item_manager():
 
     supabase = get_supabase_client()
 
-    # 获取所有物品（保持原逻辑）
+    # 获取所有物品
     items = supabase.table("items").select("*").order("name").execute().data
+
     if not items:
         st.info("暂无物品")
         return
 
-    # === 新增：搜索功能（不影响原有逻辑）===
-    search_query = st.text_input("🔍 搜索物品名称", key="item_search")
-    if search_query:
-        filtered_items = [
-            item for item in items 
-            if search_query.lower() in item["name"].lower()
-        ]
-    else:
-        filtered_items = items
-    # ======================================
-
-    for item in filtered_items:
+    for item in items:
         with st.container(border=True):
             edit_key = f"edit_{item['id']}"
             
-            # === 新增：商品类型标识（仅显示，不影响编辑）===
-            is_system = item.get("is_system", False)
-            owner_id = item.get("owner_id")
-            if is_system:
-                type_tag = "🔖 系统商品"
-            elif owner_id:
-                type_tag = "👤 玩家商品"
-            else:
-                type_tag = "❓ 未知类型"
-            # ==========================================
-
             if st.session_state.get(edit_key, False):
-                # 编辑模式（完全保留原逻辑）
+                # 编辑模式
                 with st.form(f"form_{item['id']}"):
                     st.text_input("名称", value=item["name"], disabled=True)
-                    st.caption(type_tag)  # 显示类型
                     new_effect = st.text_area("描述 (effect)", value=item.get("effect", ""))
                     col1, col2 = st.columns(2)
                     with col1:
                         save = st.form_submit_button("💾 保存")
                     with col2:
                         cancel = st.form_submit_button("❌ 取消")
+                    
                     if save:
                         supabase.table("items").update({
                             "effect": new_effect
@@ -72,15 +50,10 @@ def show_item_manager():
                         st.session_state[edit_key] = False
                         st.rerun()
             else:
-                # 查看模式（新增类型标识）
+                # 查看模式
                 st.markdown(f"### {item['name']}")
                 st.write(item.get("effect", "无描述"))
-                st.caption(f"{type_tag} | 分类: {item.get('category', 'N/A')} | 稀有度: {item.get('rarity', 'N/A')}")
-                
-                # === 新增：权限提示（仅当是系统商品时）===
-                if is_system:
-                    st.warning("⚠️ 此为系统商品，修改将影响所有玩家可见描述")
-                # ======================================
+                st.caption(f"分类: {item.get('category', 'N/A')} | 稀有度: {item.get('rarity', 'N/A')}")
                 
                 if st.button("✏️ 编辑描述", key=f"btn_{item['id']}"):
                     st.session_state[edit_key] = True
