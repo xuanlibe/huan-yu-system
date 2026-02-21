@@ -1,7 +1,7 @@
-# ==================================================#
+# ==================================================
 # 登录注册模块
 # 功能：用户登录、注册、密码验证
-# ==================================================#
+# ==================================================
 
 import streamlit as st
 from typing import Dict, Any, Optional
@@ -9,12 +9,15 @@ from core.config import get_supabase_client, MAIN_ADMIN_USERNAME, MAIN_ADMIN_PAS
 from core.errors import safe_page_load
 from utils.helpers import hash_password, verify_password, get_current_time_str
 
-# ==============================#
+# ==============================
 # 👤 用户类定义
-# ==============================#
+# ==============================
 
 class User:
-    """ 用户数据类 封装用户的所有属性和基本信息 """
+    """
+    用户数据类
+    封装用户的所有属性和基本信息
+    """
     def __init__(self, user_data: Dict[str, Any]):
         self.id = user_data.get("id")
         self.username = user_data.get("username", "")
@@ -32,16 +35,24 @@ class User:
 
     @classmethod
     def login(cls, username: str, password: str) -> Optional["User"]:
-        """ 用户登录方法 """
+        """
+        用户登录方法
+        
+        参数:
+            username: 用户名
+            password: 密码
+        
+        返回:
+            User 对象如果登录成功，否则 None
+        """
         if not username or not password:
             return None
-
-        # 🔒 特殊处理：轩璃管理员使用硬编码数据，但 ID 必须是 UUID 格式！
+        
+        # 🔒 特殊处理：轩璃管理员使用硬编码密码
         if username == MAIN_ADMIN_USERNAME:
             if password == MAIN_ADMIN_PASSWORD:
-                # 使用固定的 UUID（你可以自己生成一个）
                 user_data = {
-                    "id": "00000000-0000-0000-0000-000000000001",  # ← 合法 UUID
+                    "id": "xuanli_main_admin",
                     "username": "轩璃",
                     "spirit_stones": 999999999,
                     "is_admin": True,
@@ -60,51 +71,60 @@ class User:
             else:
                 st.toast("❌ 主管理员密码错误", icon="🔒")
                 return None
-
+        
         # 普通用户登录流程
         supabase = get_supabase_client()
         response = supabase.table("users").select("*").eq("username", username).execute()
         users = response.data if response and hasattr(response, 'data') else []
+        
         if not users:
             return None
+        
         user_data = users[0]
-
+        
         # 验证密码
         if not verify_password(password, user_data.get("password_hash", "")):
             return None
-
+        
         # 检查是否被封禁
         if user_data.get("is_banned", False):
             st.toast("❌ 账号已被封禁", icon="🚫")
             return None
-
+        
         # 更新最后登录时间
         supabase.table("users").update({"last_login": get_current_time_str()}).eq("id", user_data["id"]).execute()
+        
         return cls(user_data)
 
     @staticmethod
     def update_spirit_stones(user_id: str, amount: int):
         """更新用户灵石数量"""
         supabase = get_supabase_client()
+        # 这里调用你的存储过程或直接更新
         # supabase.rpc("add_spirit_stones", {"uid": user_id, "amount": amount}).execute()
 
-# ==============================#
+# ==============================
 # 🖥️ 登录页面
-# ==============================#
+# ==============================
 
 def show_login_page():
-    """ 显示登录注册页面 """
+    """
+    显示登录注册页面
+    包含登录和注册两个标签页
+    """
     st.set_page_config(page_title="寰宇系统 - 登录", layout="centered")
     st.title("🌌 寰宇系统")
     st.markdown("欢迎来到修真世界！踏入仙途，成就大道。")
+    
     tab1, tab2 = st.tabs(["🔑 登录", "会员注册"])
-
+    
     # --- 登录标签页 ---
     with tab1:
         with st.form("login_form"):
             username = st.text_input("道号（用户名）", key="login_username")
             password = st.text_input("密令（密码）", type="password", key="login_password")
             submit = st.form_submit_button("登入修仙界", key="login_submit")
+            
             if submit:
                 if not username or not password:
                     st.error("请输入用户名和密码")
@@ -116,7 +136,7 @@ def show_login_page():
                         st.rerun()
                     else:
                         st.error("用户名或密码错误")
-
+    
     # --- 注册标签页 ---
     with tab2:
         with st.form("register_form"):
@@ -124,6 +144,7 @@ def show_login_page():
             new_password = st.text_input("设置密令（至少6位）", type="password", key="reg_password")
             confirm_password = st.text_input("确认密令", type="password", key="reg_confirm")
             submit = st.form_submit_button("踏入仙途", key="reg_submit")
+            
             if submit:
                 if len(new_username) < 2 or len(new_username) > 20:
                     st.error("道号长度需在2-20字符之间")
@@ -137,12 +158,13 @@ def show_login_page():
 def _handle_registration(username: str, password: str):
     """处理注册逻辑（内部函数）"""
     supabase = get_supabase_client()
+    
     # 检查用户名是否已存在
     existing = supabase.table("users").select("id").eq("username", username).execute()
     if existing and existing.data:
         st.error("该道号已被占用")
         return
-
+    
     # 创建新用户
     new_user_data = {
         "username": username,
@@ -158,7 +180,9 @@ def _handle_registration(username: str, password: str):
         "lifespan": 80,
         "last_login": get_current_time_str()
     }
+    
     result = supabase.table("users").insert(new_user_data).execute()
+    
     if result and result.data:
         user = User(result.data[0])
         _ensure_user_cultivation_record(user.id)
